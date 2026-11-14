@@ -1,0 +1,260 @@
+/* PWA shell UI: install and update controls. */
+.pwa-install {
+  position: fixed;
+  z-index: 40;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  left: calc(18px + env(safe-area-inset-left));
+  display: inline-flex;
+  align-items: center;
+  min-height: 43px;
+  padding: 0 15px;
+  color: var(--paper-2, #f8f2e6);
+  background: var(--ink, #1d2a25);
+  border: 1px solid var(--ink, #1d2a25);
+  border-radius: 999px;
+  box-shadow: 0 9px 26px rgba(21, 29, 25, 0.24);
+  font-family: var(--font-sans, "Microsoft YaHei", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  gap: 7px;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.pwa-install:hover {
+  background: var(--accent, #b44327);
+  border-color: var(--accent, #b44327);
+  transform: translateY(-1px);
+}
+
+.pwa-install:active {
+  transform: translateY(0);
+}
+
+.pwa-install[hidden] {
+  display: none !important;
+}
+
+.pwa-install-icon {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  border: 1px solid rgba(248, 242, 230, 0.4);
+  border-radius: 50%;
+  place-items: center;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.pwa-update {
+  position: fixed;
+  z-index: 40;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  left: 50%;
+  display: flex;
+  align-items: center;
+  width: min(530px, calc(100% - 28px));
+  padding: 11px 12px 11px 15px;
+  color: var(--paper-2, #f8f2e6);
+  background: var(--ink, #1d2a25);
+  border: 1px solid rgba(248, 242, 230, 0.2);
+  border-radius: 4px;
+  box-shadow: 0 15px 45px rgba(7, 10, 8, 0.28);
+  font-family: var(--font-sans, "Microsoft YaHei", sans-serif);
+  gap: 14px;
+  transform: translateX(-50%);
+}
+
+.pwa-update[hidden] {
+  display: none !important;
+}
+
+.pwa-update-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.pwa-update-copy strong {
+  color: var(--paper-2, #f8f2e6);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
+.pwa-update-copy span {
+  color: rgba(248, 242, 230, 0.7);
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.pwa-update button {
+  flex: 0 0 auto;
+  min-height: 35px;
+  padding: 0 12px;
+  color: var(--ink, #1d2a25);
+  background: var(--paper-2, #f8f2e6);
+  border: 0;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.pwa-update button:hover {
+  background: var(--accent-soft, #f5ded6);
+}
+
+.pwa-update button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.pwa-guide-layer {
+  position: fixed;
+  z-index: 65;
+  inset: 0;
+  display: grid;
+  padding: 22px;
+  overflow-y: auto;
+  background: rgba(21, 29, 25, 0.56);
+  backdrop-filter: blur(6px);
+  place-items: center;
+}
+
+.pwa-guide {
+  position: relative;
+  width: min(430px, 100%);
+  padding: 29px 26px 24px;
+  color: var(--ink, #1d2a25);
+  background: var(--paper-2, #fbf7ee);
+  border: 1px solid rgba(255, 250, 240, 0.3);
+  border-radius: 5px;
+  box-shadow: 0 30px 90px rgba(7, 10, 8, 0.35);
+  font-family: var(--font-sans, "Microsoft YaHei", sans-serif);
+}
+
+.pwa-guide-close {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  display: grid;
+  width: 33px;
+  height: 33px;
+  color: var(--ink-2, #536057);
+  background: transparent;
+  border: 1px solid var(--line, #d8d2c5);
+  border-radius: 50%;
+  place-items: center;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pwa-guide-close:hover {
+  color: var(--accent, #b44327);
+  background: var(--paper-3, #f3ecdf);
+}
+
+.pwa-guide .pwa-guide-kicker {
+  margin: 0 0 11px;
+  color: var(--accent, #b44327);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.pwa-guide h2 {
+  margin: 0;
+  color: var(--ink, #1d2a25);
+  font-family: var(--font-serif, "Songti SC", serif);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.pwa-guide ol {
+  padding-left: 1.25em;
+  margin: 19px 0 16px;
+  color: var(--ink-2, #536057);
+  font-size: 0.78rem;
+  line-height: 1.9;
+}
+
+.pwa-guide li + li {
+  margin-top: 4px;
+}
+
+.pwa-guide p {
+  margin: 0 0 16px;
+  color: var(--muted, #7a847c);
+  font-size: 0.67rem;
+  line-height: 1.8;
+}
+
+.pwa-guide .pwa-guide-ok {
+  width: 100%;
+  min-height: 43px;
+  color: var(--paper-2, #f8f2e6);
+  background: var(--ink, #1d2a25);
+  border: 1px solid var(--ink, #1d2a25);
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.pwa-guide .pwa-guide-ok:hover {
+  background: var(--accent, #b44327);
+  border-color: var(--accent, #b44327);
+}
+
+body.pwa-guide-open {
+  overflow: hidden;
+}
+
+@media (max-width: 520px) {
+  .pwa-install {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: calc(12px + env(safe-area-inset-left));
+    min-height: 40px;
+    padding: 0 13px;
+    font-size: 0.72rem;
+  }
+
+  .pwa-update {
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    width: calc(100% - 20px);
+    padding: 10px 10px 10px 12px;
+    gap: 9px;
+  }
+
+  .pwa-update-copy span {
+    font-size: 0.59rem;
+  }
+
+  .pwa-update button {
+    min-height: 33px;
+    padding: 0 10px;
+    font-size: 0.64rem;
+  }
+
+  .pwa-guide-layer {
+    padding: 14px;
+  }
+
+  .pwa-guide {
+    padding: 25px 20px 20px;
+  }
+
+  .pwa-guide h2 {
+    font-size: 1.55rem;
+  }
+}
