@@ -3571,6 +3571,102 @@ button.brand {
   line-height: 1.8;
 }
 
+/* ---------- Announcements ---------- */
+
+.announcements-panel {
+  padding: clamp(20px, 3.4vw, 34px);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 15px 40px rgba(41, 48, 39, 0.045);
+}
+
+.announcement-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.announcement-item {
+  position: relative;
+  padding: 20px 2px;
+  border-top: 1px solid var(--line);
+}
+
+.announcement-item:first-child {
+  padding-top: 8px;
+  border-top: 0;
+}
+
+.announcement-item.is-latest {
+  padding-left: 15px;
+}
+
+.announcement-item.is-latest::before {
+  position: absolute;
+  top: 17px;
+  bottom: 17px;
+  left: 0;
+  width: 2px;
+  content: "";
+  background: var(--accent);
+}
+
+.announcement-item:first-child.is-latest::before {
+  top: 5px;
+}
+
+.announcement-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.61rem;
+  letter-spacing: 0.03em;
+  gap: 8px;
+}
+
+.announcement-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  color: var(--accent-dark);
+  background: var(--accent-soft);
+  border-radius: 2px;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.announcement-title {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 1.38rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.announcement-content {
+  color: var(--ink-2);
+  font-size: 0.77rem;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.announcement-note {
+  padding-top: 15px;
+  margin: 5px 0 0;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  font-size: 0.6rem;
+  line-height: 1.7;
+}
+
 /* ---------- Account panels ---------- */
 
 .panel-heading {
@@ -3796,8 +3892,19 @@ button.brand {
 }
 
 .record-detail {
+  display: flex;
+  flex-direction: column;
   color: var(--ink-2);
   font-size: 0.68rem;
+  line-height: 1.55;
+  gap: 3px;
+}
+
+.record-scope {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 0.6rem;
+  line-height: 1.5;
 }
 
 .record-time {
@@ -4627,7 +4734,8 @@ a.is-disabled {
     line-height: 1.8;
   }
 
-  .records-panel {
+  .records-panel,
+  .announcements-panel {
     padding: 17px 14px;
   }
 
@@ -4719,6 +4827,14 @@ a.is-disabled {
   .record-detail {
     grid-area: detail;
     font-size: 0.63rem;
+  }
+
+  .announcement-title {
+    font-size: 1.22rem;
+  }
+
+  .announcement-content {
+    font-size: 0.73rem;
   }
 
   .about-card {
@@ -4865,7 +4981,8 @@ a.is-disabled {
     font-size: clamp(2.35rem, 10.6vw, 3rem);
   }
 
-  .records-panel {
+  .records-panel,
+  .announcements-panel {
     padding: 15px 12px;
   }
 
@@ -6297,6 +6414,7 @@ window.QUIZ_DATA = {
   };
   const BILIBILI_UID = "1445964965";
   const BILIBILI_URL = "https://space.bilibili.com/" + BILIBILI_UID;
+  const ANNOUNCEMENTS_FILE = "announcements.json";
   const MUNICIPALITIES = ["北京市", "天津市", "上海市", "重庆市"];
   const SPECIAL_ADMINISTRATIVE_REGIONS = ["香港特别行政区", "澳门特别行政区"];
   const REGISTRATION_WARNING = "本应用不支持短信验证登录，请牢记你的密码，建议截屏或记入手机备忘录。";
@@ -6402,6 +6520,10 @@ window.QUIZ_DATA = {
     authMode: "login",
     authNext: "home",
     account: null,
+    announcements: null,
+    announcementsLoading: false,
+    announcementsError: "",
+    announcementSeq: 0,
     scopeDraft: [],
     blankSuggestions: [],
     blankHighlight: -1,
@@ -6795,6 +6917,7 @@ window.QUIZ_DATA = {
       userId: user.id,
       gameId: result.gameId,
       mode: result.mode === "blank" ? "blank" : "choice",
+      scope: Array.isArray(result.scope) ? result.scope.slice() : [],
       score: result.score,
       total: result.total,
       correct: result.correctCount,
@@ -6968,6 +7091,7 @@ window.QUIZ_DATA = {
   function headerHTML(active) {
     const navItems = [
       { id: "home", label: "首页" },
+      { id: "announcements", label: "公告" },
       { id: "series", label: "相关游戏" },
       { id: "about", label: "关于" }
     ];
@@ -7775,6 +7899,7 @@ window.QUIZ_DATA = {
     state.settings.mode = normalizeMode(state.settings.mode);
     saveSettings();
 
+    const scopeProvinces = getScopeProvinces();
     const scopeEntries = getScopeEntries();
     const total = Math.min(state.settings.count, scopeEntries.length);
     const questions = sample(scopeEntries, total).map(makeQuestion);
@@ -7783,6 +7908,7 @@ window.QUIZ_DATA = {
     state.quiz = {
       gameId: createGameId(),
       mode: state.settings.mode,
+      scope: scopeProvinces.slice(),
       questions: questions,
       index: 0,
       answers: new Array(total).fill(null),
@@ -8176,6 +8302,7 @@ window.QUIZ_DATA = {
     state.result = {
       gameId: quiz.gameId,
       mode: quiz.mode,
+      scope: Array.isArray(quiz.scope) ? quiz.scope.slice() : [],
       reason: reason,
       questions: quiz.questions,
       answers: quiz.answers.slice(),
@@ -8725,6 +8852,160 @@ window.QUIZ_DATA = {
     );
   }
 
+  /* ---------- Announcements screen ---------- */
+
+  function normalizeAnnouncements(payload) {
+    if (!payload || !Array.isArray(payload.announcements)) {
+      throw new Error("公告数据格式不正确");
+    }
+    return payload.announcements
+      .filter(function (item) {
+        return item && typeof item.title === "string" && typeof item.content === "string";
+      })
+      .map(function (item) {
+        return {
+          id: typeof item.id === "string" ? item.id : "",
+          title: item.title,
+          content: item.content,
+          createdAt: typeof item.createdAt === "string" ? item.createdAt : ""
+        };
+      })
+      .sort(function (left, right) {
+        const leftTime = new Date(left.createdAt).getTime();
+        const rightTime = new Date(right.createdAt).getTime();
+        return (Number.isFinite(rightTime) ? rightTime : 0) - (Number.isFinite(leftTime) ? leftTime : 0);
+      });
+  }
+
+  function announcementsTemplate() {
+    const announcements = Array.isArray(state.announcements) ? state.announcements : [];
+    let body = "";
+
+    if (state.announcementsLoading) {
+      body =
+        '<div class="page-loading" role="status">' +
+        '<span class="loading-spinner" aria-hidden="true"></span>' +
+        "<p>正在读取公告…</p>" +
+        "</div>";
+    } else if (state.announcementsError) {
+      body =
+        '<div class="empty-panel">' +
+        '<span class="empty-mark" aria-hidden="true">' + ICONS.info + "</span>" +
+        "<h2>公告暂时无法加载</h2>" +
+        "<p>" + escapeHTML(state.announcementsError) + "</p>" +
+        '<button type="button" class="btn btn-primary" data-retry-announcements>重新加载</button>' +
+        "</div>";
+    } else if (!announcements.length) {
+      body =
+        '<div class="empty-panel">' +
+        '<span class="empty-mark" aria-hidden="true">' + ICONS.info + "</span>" +
+        "<h2>还没有公告</h2>" +
+        "<p>版本更新、活动和重要说明会发布在这里。</p>" +
+        '<button type="button" class="btn btn-primary" data-nav="home">去首页</button>' +
+        "</div>";
+    } else {
+      body =
+        '<div class="announcement-list">' +
+        announcements.map(function (item, index) {
+          return (
+            '<article class="announcement-item' + (index === 0 ? " is-latest" : "") + '">' +
+            '<div class="announcement-meta">' +
+            (index === 0 ? '<span class="announcement-badge">最新</span>' : "") +
+            "<time" + (item.createdAt ? ' datetime="' + escapeHTML(item.createdAt) + '"' : "") + ">" +
+            escapeHTML(item.createdAt ? formatDateTime(item.createdAt) : "时间未记录") +
+            "</time>" +
+            "</div>" +
+            '<h3 class="announcement-title">' + escapeHTML(item.title) + "</h3>" +
+            '<div class="announcement-content">' + escapeHTML(item.content) + "</div>" +
+            "</article>"
+          );
+        }).join("") +
+        "</div>";
+    }
+
+    return pageShell(
+      "announcements",
+      '<section class="page-hero announcements-hero" aria-labelledby="announcementsTitle">' +
+      '<p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>公告栏</p>' +
+      '<h1 id="announcementsTitle" tabindex="-1">方舆近况，<br>都在这里。</h1>' +
+      '<p class="page-lead">版本更新、活动与重要说明，会按时间记录在这里。</p>' +
+      "</section>" +
+      '<section class="announcements-panel" aria-label="历史公告">' +
+      '<div class="panel-heading">' +
+      '<div><p class="panel-kicker">历史公告</p><h2>公告列表</h2></div>' +
+      '<button type="button" class="inline-link" data-refresh-announcements>' +
+      ICONS.refresh + "刷新" +
+      "</button>" +
+      "</div>" +
+      body +
+      (!state.announcementsLoading && !state.announcementsError && announcements.length
+        ? '<p class="announcement-note">公告按发布时间从新到旧排列。</p>'
+        : "") +
+      "</section>"
+    );
+  }
+
+  async function openAnnouncementsScreen(options) {
+    const settings = options || {};
+    const previousScroll = window.scrollY;
+    closeAllModals({ restoreFocus: false });
+    stopTimer();
+    state.screen = "announcements";
+    state.quiz = null;
+    state.result = null;
+    state.account = null;
+    state.announcements = null;
+    state.announcementsLoading = true;
+    state.announcementsError = "";
+    state.announcementSeq += 1;
+    const requestId = state.announcementSeq;
+    document.title = "公告栏 · 方舆";
+    app.innerHTML = announcementsTemplate();
+    if (settings.preserveScroll) window.scrollTo(0, previousScroll);
+    else scrollToTop();
+    if (!settings.noFocus) {
+      window.requestAnimationFrame(function () {
+        focusWithoutScroll($("#announcementsTitle"));
+      });
+    }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(function () { controller.abort(); }, 10000);
+    try {
+      const response = await fetch(ANNOUNCEMENTS_FILE + "?t=" + Date.now(), {
+        cache: "no-store",
+        signal: controller.signal,
+        headers: { Accept: "application/json" }
+      });
+      window.clearTimeout(timeout);
+      if (requestId !== state.announcementSeq || state.screen !== "announcements") return;
+      if (response.status === 404) {
+        state.announcements = [];
+      } else {
+        if (!response.ok) throw new Error("公告加载失败（HTTP " + response.status + "）");
+        state.announcements = normalizeAnnouncements(await response.json());
+      }
+    } catch (error) {
+      window.clearTimeout(timeout);
+      if (requestId !== state.announcementSeq || state.screen !== "announcements") return;
+      state.announcementsError = error.name === "AbortError"
+        ? "公告读取超时，请检查网络后重试"
+        : "公告暂时无法加载，请稍后再试";
+    } finally {
+      if (requestId === state.announcementSeq && state.screen === "announcements") {
+        state.announcementsLoading = false;
+        app.innerHTML = announcementsTemplate();
+        if (settings.preserveScroll) window.scrollTo(0, previousScroll);
+        else scrollToTop();
+        if (!settings.noFocus) {
+          window.requestAnimationFrame(function () {
+            focusWithoutScroll($("#announcementsTitle"));
+          });
+        }
+      }
+    }
+  }
+
   /* ---------- Account screen ---------- */
 
   function accountSummaryHTML(account) {
@@ -8755,14 +9036,23 @@ window.QUIZ_DATA = {
       '<div class="record-list">' +
       '<div class="record-columns" aria-hidden="true"><span>时间</span><span>成绩</span><span>答题情况</span><span>用时</span></div>' +
       records.map(function (record) {
+        const hasScope = Array.isArray(record.scope);
+        const recordScope = hasScope ? normalizeProvinceScope(record.scope) : [];
+        const scopeLabel = hasScope ? scopeSummaryText(recordScope) : "未记录（旧版记录）";
+        const scopeTitle = hasScope
+          ? recordScope.map(shortProvinceName).join("、")
+          : "这条记录创建时还没有出题范围信息";
         return (
           '<div class="record-row">' +
           '<span class="record-date">' + formatDateTime(record.playedAt) + "</span>" +
           '<span class="record-score"><strong>' + record.score + "</strong><small>分</small>" +
           (record.total < 5 ? '<em>练习局</em>' : "") + "</span>" +
-          '<span class="record-detail">' + (record.mode === "blank" ? "填空题" : "选择题") + " · 答对 " + record.correct + " / " + record.total + " 题" +
+          '<span class="record-detail">' +
+          '<span class="record-detail-main">' + (record.mode === "blank" ? "填空题" : "选择题") + " · 答对 " + record.correct + " / " + record.total + " 题" +
           (record.wrong ? " · 答错 " + record.wrong : "") +
           (record.unanswered ? " · 未答 " + record.unanswered : "") + "</span>" +
+          '<span class="record-scope" title="' + escapeHTML(scopeTitle) + '">出题范围：' + escapeHTML(scopeLabel) + "</span>" +
+          "</span>" +
           '<span class="record-time">' + formatClock(record.durationSeconds) + "</span>" +
           "</div>"
         );
@@ -8891,6 +9181,10 @@ window.QUIZ_DATA = {
 
   function navigateTo(target) {
     closeAllModals({ restoreFocus: false });
+    if (target === "announcements") {
+      openAnnouncementsScreen();
+      return;
+    }
     if (target === "about") {
       renderAbout();
       return;
@@ -9086,6 +9380,20 @@ window.QUIZ_DATA = {
         state.result.saveError = "";
         updateSaveBanner();
         persistResultIfPossible();
+        return;
+      }
+
+      const refreshAnnouncements = event.target.closest("[data-refresh-announcements]");
+      if (refreshAnnouncements) {
+        event.preventDefault();
+        openAnnouncementsScreen({ preserveScroll: true, noFocus: true });
+        return;
+      }
+
+      const retryAnnouncements = event.target.closest("[data-retry-announcements]");
+      if (retryAnnouncements) {
+        event.preventDefault();
+        openAnnouncementsScreen({ preserveScroll: true, noFocus: true });
         return;
       }
 

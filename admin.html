@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f3ecdf">
+  <title>方舆 · 公告管理</title>
+  <style>
+    :root {
+      --ink: #1d2a25;
+      --ink-2: #536057;
+      --muted: #7a847c;
+      --accent: #b44327;
+      --accent-dark: #8e3019;
+      --accent-soft: #f7e4dc;
+      --paper: #f3ecdf;
+      --paper-2: #fbf7ee;
+      --paper-3: #eee5d7;
+      --line: #d8d2c5;
+      --line-strong: #bdb5a5;
+      --jade: #3f7c67;
+      --font-sans: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", sans-serif;
+      --font-serif: "Songti SC", STSong, "Source Han Serif SC", "Noto Serif CJK SC", SimSun, serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--paper); }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(180, 67, 39, 0.08), transparent 30%),
+        linear-gradient(135deg, #f7f0e4, #efe6d7);
+      font-family: var(--font-sans);
+      line-height: 1.7;
+    }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    a { color: var(--accent-dark); }
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(900px, calc(100% - 36px));
+      padding: 22px 0;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--line);
+      gap: 16px;
+    }
+    .admin-brand { display: flex; align-items: center; gap: 10px; }
+    .admin-mark {
+      display: grid;
+      width: 37px; height: 37px;
+      color: var(--paper-2);
+      background: var(--accent);
+      border-radius: 3px;
+      place-items: center;
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .admin-brand strong { font-family: var(--font-serif); font-size: 1.05rem; }
+    .admin-brand small { display: block; color: var(--muted); font-size: .59rem; letter-spacing: .12em; }
+    .back-link { color: var(--muted); font-size: .7rem; text-decoration: none; }
+    .back-link:hover { color: var(--accent); }
+    .admin-main {
+      width: min(900px, calc(100% - 36px));
+      padding: 43px 0 70px;
+      margin: 0 auto;
+    }
+    .hero { margin-bottom: 28px; }
+    .kicker {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: .63rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+    }
+    .hero h1 {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.16;
+    }
+    .hero p { max-width: 42em; margin: 15px 0 0; color: var(--muted); font-size: .8rem; }
+    .card {
+      padding: 24px;
+      margin-top: 16px;
+      background: var(--paper-2);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      box-shadow: 0 12px 34px rgba(41, 48, 39, .045);
+    }
+    .card h2 {
+      margin: 0 0 5px;
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      letter-spacing: -.01em;
+    }
+    .card .card-lead { margin: 0 0 17px; color: var(--muted); font-size: .7rem; line-height: 1.8; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-top: 13px; }
+    .field > span { color: var(--ink-2); font-size: .67rem; font-weight: 600; letter-spacing: .03em; }
+    .field input, .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: #fffdf8;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      outline: 0;
+      font-size: .82rem;
+    }
+    .field input:focus, .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(180, 67, 39, .08);
+    }
+    .field textarea { resize: vertical; min-height: 150px; line-height: 1.75; }
+    .checkbox {
+      display: flex;
+      align-items: flex-start;
+      margin-top: 11px;
+      color: var(--muted);
+      font-size: .67rem;
+      line-height: 1.6;
+      gap: 7px;
+    }
+    .checkbox input { margin-top: 3px; accent-color: var(--accent); }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; margin-top: 15px; gap: 8px; }
+    .btn {
+      min-height: 38px;
+      padding: 0 15px;
+      border: 1px solid var(--line-strong);
+      border-radius: 2px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .btn-primary { color: var(--paper-2); background: var(--ink); border-color: var(--ink); }
+    .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+    .btn-quiet { color: var(--ink-2); background: transparent; }
+    .btn-quiet:hover { background: var(--paper-3); }
+    .btn:disabled { cursor: wait; opacity: .55; }
+    .status {
+      min-height: 22px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: .68rem;
+      line-height: 1.7;
+    }
+    .status.is-error { color: var(--accent-dark); }
+    .status.is-ok { color: var(--jade); }
+    .notice {
+      padding: 10px 12px;
+      margin: 0 0 14px;
+      color: var(--accent-dark);
+      background: #fbf1e7;
+      border-left: 2px solid var(--accent);
+      font-size: .67rem;
+      line-height: 1.75;
+    }
+    details {
+      padding-top: 15px;
+      margin-top: 17px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .67rem;
+      line-height: 1.8;
+    }
+    details summary { color: var(--ink-2); cursor: pointer; font-weight: 600; }
+    details ol { padding-left: 1.3em; margin: 9px 0 0; }
+    details li + li { margin-top: 4px; }
+    code {
+      padding: 1px 4px;
+      color: var(--accent-dark);
+      background: var(--paper-3);
+      border-radius: 2px;
+      font-size: .9em;
+    }
+    .history { display: flex; flex-direction: column; margin-top: 9px; }
+    .history-item { padding: 15px 0; border-top: 1px solid var(--line); }
+    .history-item:first-child { border-top: 0; padding-top: 2px; }
+    .history-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .history-title { margin: 0; font-family: var(--font-serif); font-size: 1.02rem; line-height: 1.4; overflow-wrap: anywhere; }
+    .history-date { flex: 0 0 auto; color: var(--muted); font-size: .59rem; font-variant-numeric: tabular-nums; }
+    .history-content { margin: 5px 0 0; color: var(--ink-2); font-size: .72rem; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .delete-btn {
+      padding: 2px 7px;
+      margin-top: 8px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      font-size: .59rem;
+    }
+    .delete-btn:hover { color: var(--accent-dark); border-color: rgba(180, 67, 39, .3); }
+    .empty { padding: 18px 0 5px; color: var(--muted); font-size: .72rem; }
+    @media (max-width: 520px) {
+      .admin-header { padding: 16px 0; }
+      .admin-main { padding-top: 28px; }
+      .card { padding: 18px 15px; }
+      .hero h1 { font-size: 2.5rem; }
+      .history-head { flex-direction: column; gap: 3px; }
+      .history-date { order: -1; }
+      .card h2 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="admin-header">
+    <div class="admin-brand">
+      <span class="admin-mark" aria-hidden="true">方</span>
+      <div><strong>方舆 · 公告管理</strong><small>ANNOUNCEMENTS</small></div>
+    </div>
+    <a class="back-link" href="./">← 返回游戏</a>
+  </header>
+
+  <main class="admin-main">
+    <section class="hero">
+      <p class="kicker">作者工具</p>
+      <h1>发布一条公告，<br>玩家就能看到。</h1>
+      <p>公告会保存到 GitHub 仓库的 announcements.json，玩家打开游戏里的「公告」页即可看到历史记录。</p>
+    </section>
+
+    <section class="card">
+      <h2>1. 连接 GitHub</h2>
+      <p class="card-lead">只有持有仓库写入令牌的人才能发布公告。令牌只保存在这台浏览器，不会写进游戏代码。</p>
+      <p class="notice">令牌等同于仓库写入权限。不要在公用电脑保存，不要发给别人。建议使用有效期为 90 天、仅限 <strong>firsttown/fangyu</strong> 的 Fine-grained token。</p>
+      <label class="field">
+        <span>GitHub 访问令牌</span>
+        <input id="tokenInput" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_...">
+      </label>
+      <label class="checkbox">
+        <input id="rememberToken" type="checkbox" checked>
+        <span>在这台浏览器记住令牌</span>
+      </label>
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="saveToken">保存并验证</button>
+        <button type="button" class="btn btn-quiet" id="clearToken">清除令牌</button>
+      </div>
+      <p class="status" id="tokenStatus" role="status" aria-live="polite"></p>
+
+      <details>
+        <summary>第一次使用？如何创建令牌</summary>
+        <ol>
+          <li>打开 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">GitHub Fine-grained token 页面</a>。</li>
+          <li>Token name 填 <code>fangyu-announcements</code>，Expiration 选择 90 天或自定义。</li>
+          <li>Resource owner 选 <code>firsttown</code>。</li>
+          <li>Repository access 选 <strong>Only select repositories</strong>，只勾选 <code>firsttown/fangyu</code>。</li>
+          <li>Repository permissions 找到 <strong>Contents</strong>，设为 <strong>Read and write</strong>。</li>
+          <li>Generate token，复制生成的令牌，粘贴到上面的输入框。</li>
+        </ol>
+        <p>如果令牌泄露，立刻回到 GitHub 撤销它。</p>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>2. 发布新公告</h2>
+      <p class="card-lead">标题和内容会按纯文本保存，换行会保留。</p>
+      <form id="publishForm">
+        <label class="field">
+          <span>公告标题</span>
+          <input id="titleInput" type="text" maxlength="100" placeholder="例如：新题库已更新">
+        </label>
+        <label class="field">
+          <span>公告内容</span>
+          <textarea id="contentInput" maxlength="5000" placeholder="写一点公告内容……"></textarea>
+        </label>
+        <div class="actions">
+          <button type="submit" class="btn btn-primary" id="publishButton">发布公告</button>
+        </div>
+        <p class="status" id="publishStatus" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>历史公告</h2>
+      <p class="card-lead" id="historyLead">正在读取公告…</p>
+      <div class="history" id="historyList"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var OWNER = "firsttown";
+      var REPO = "fangyu";
+      var BRANCH = "main";
+      var FILE_PATH = "announcements.json";
+      var API_URL = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + FILE_PATH;
+      var TOKEN_KEY = "fangyu-announcement-admin-token";
+      var tokenInput = document.getElementById("tokenInput");
+      var rememberToken = document.getElementById("rememberToken");
+      var tokenStatus = document.getElementById("tokenStatus");
+      var publishForm = document.getElementById("publishForm");
+      var publishButton = document.getElementById("publishButton");
+      var publishStatus = document.getElementById("publishStatus");
+      var titleInput = document.getElementById("titleInput");
+      var contentInput = document.getElementById("contentInput");
+      var historyLead = document.getElementById("historyLead");
+      var historyList = document.getElementById("historyList");
+      var state = { announcements: [], sha: null, loading: false };
+
+      function setStatus(element, message, kind) {
+        if (!element) return;
+        element.textContent = message || "";
+        element.className = "status" + (kind ? " is-" + kind : "");
+      }
+
+      function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, function (character) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
+        });
+      }
+
+      function formatDate(value) {
+        if (!value) return "时间未记录";
+        var date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "时间未记录";
+        try {
+          return new Intl.DateTimeFormat("zh-CN", {
+            year: "numeric", month: "2-digit", day: "2-digit",
+            hour: "2-digit", minute: "2-digit"
+          }).format(date);
+        } catch (error) {
+          return date.toLocaleString();
+        }
+      }
+
+      function getToken() {
+        return tokenInput.value.trim();
+      }
+
+      function readSavedToken() {
+        try {
+          return localStorage.getItem(TOKEN_KEY) || "";
+        } catch (error) {
+          return "";
+        }
+      }
+
+      function saveToken(token) {
+        try {
+          if (rememberToken.checked) localStorage.setItem(TOKEN_KEY, token);
+          else localStorage.removeItem(TOKEN_KEY);
+        } catch (error) {}
+      }
+
+      function apiHeaders(token) {
+        return {
+          "Accept": "application/vnd.github+json",
+          "Authorization": "Bearer " + token,
+          "X-GitHub-Api-Version": "2022-11-28"
+        };
+      }
+
+      function encodeBase64(text) {
+        var bytes = new TextEncoder().encode(text);
+        var binary = "";
+        for (var index = 0; index < bytes.length; index += 0x8000) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(index, index + 0x8000));
+        }
+        return btoa(binary);
+      }
+
+      function decodeBase64(value) {
+        var binary = atob(String(value || "").replace(/\s/g, ""));
+        var bytes = new Uint8Array(binary.length);
+        for (var index = 0; index < binary.length; index += 1) {
+          bytes[index] = binary.charCodeAt(index);
+        }
+        return new TextDecoder().decode(bytes);
+      }
+
+      function normalizeData(payload) {
+        if (!payload || !Array.isArray(payload.announcements)) {
+          throw new Error("公告文件格式异常");
+        }
+        return payload.announcements
+          .filter(function (item) {
+            return item && typeof item.title === "string" && typeof item.content === "string";
+          })
+          .sort(function (left, right) {
+            return new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime();
+          });
+      }
+
+      function renderHistory() {
+        historyLead.textContent = state.announcements.length
+          ? "共 " + state.announcements.length + " 条公告，按发布时间从新到旧排列。"
+          : "还没有公告。发布第一条后，玩家会在游戏的公告页看到。";
+        if (!state.announcements.length) {
+          historyList.innerHTML = '<p class="empty">暂无公告。</p>';
+          return;
+        }
+        historyList.innerHTML = state.announcements.map(function (item) {
+          return (
+            '<article class="history-item">' +
+            '<div class="history-head">' +
+            '<h3 class="history-title">' + escapeHTML(item.title) + "</h3>" +
+            '<span class="history-date">' + formatDate(item.createdAt) + "</span>" +
+            "</div>" +
+            '<div class="history-content">' + escapeHTML(item.content) + "</div>" +
+            '<button type="button" class="delete-btn" data-delete-id="' + escapeHTML(item.id || "") + '">删除</button>' +
+            "</article>"
+          );
+        }).join("");
+      }
+
+      async function getFileWithToken(token) {
+        var response = await fetch(API_URL + "?ref=" + encodeURIComponent(BRANCH), {
+          headers: apiHeaders(token),
+          cache: "no-store"
+        });
+        if (response.status === 404) {
+          return { announcements: [], sha: null };
+        }
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("令牌无效，或没有 firsttown/fangyu 的 Contents 写入权限");
+        }
+        if (!response.ok) {
+          throw new Error("读取公告失败（HTTP " + response.status + "）");
+        }
+        var data = await response.json();
+        var payload = JSON.parse(decodeBase64(data.content));
+        return { announcements: normalizeData(payload), sha: data.sha };
+      }
+
+      async function getPublicFile() {
+        var response = await fetch("./announcements.json?t=" + Date.now(), { cache: "no-store" });
+        if (response.status === 404) return { announcements: [], sha: null };
+        if (!response.ok) throw new Error("读取公告失败（HTTP " + response.status + "）");
+        return { announcements: normalizeData(await response.json()), sha: null };
+      }
+
+      async function loadWithToken(token) {
+        setStatus(tokenStatus, "正在验证令牌…");
+        var result = await getFileWithToken(token);
+        state.announcements = result.announcements;
+        state.sha = result.sha;
+        renderHistory();
+        setStatus(tokenStatus, "已连接 firsttown/fangyu，可以发布公告。", "ok");
+        saveToken(token);
+      }
+
+      async function loadPublic() {
+        try {
+          var result = await getPublicFile();
+          state.announcements = result.announcements;
+          state.sha = null;
+          renderHistory();
+        } catch (error) {
+          state.announcements = [];
+          renderHistory();
+        }
+      }
+
+      async function putFile(token, announcements, sha, message) {
+        var body = {
+          message: message,
+          content: encodeBase64(JSON.stringify({ version: 1, announcements: announcements }, null, 2) + "\n"),
+          branch: BRANCH
+        };
+        if (sha) body.sha = sha;
+        var response = await fetch(API_URL, {
+          method: "PUT",
+          headers: Object.assign({ "Content-Type": "application/json" }, apiHeaders(token)),
+          body: JSON.stringify(body)
+        });
+        if (response.status === 409) {
+          throw new Error("公告文件刚被更新，请刷新页面后再试");
+        }
+        if (!response.ok) {
+          var error = null;
+          try { error = await response.json(); } catch (e) {}
+          throw new Error((error && error.message) || "发布失败（HTTP " + response.status + "）");
+        }
+        return response.json();
+      }
+
+      async function reloadAfterWrite(token) {
+        var result = await getFileWithToken(token);
+        state.announcements = result.announcements;
+        state.sha = result.sha;
+        renderHistory();
+      }
+
+      document.getElementById("saveToken").addEventListener("click", async function () {
+        var token = getToken();
+        if (!token) {
+          setStatus(tokenStatus, "请先粘贴 GitHub 访问令牌。", "error");
+          return;
+        }
+        try {
+          await loadWithToken(token);
+        } catch (error) {
+          setStatus(tokenStatus, error.message, "error");
+        }
+      });
+
+      document.getElementById("clearToken").addEventListener("click", function () {
+        tokenInput.value = "";
+        try { localStorage.removeItem(TOKEN_KEY); } catch (error) {}
+        state.sha = null;
+        setStatus(tokenStatus, "已清除本机保存的令牌。");
+        loadPublic();
+      });
+
+      publishForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        var token = getToken();
+        var title = titleInput.value.trim();
+        var content = contentInput.value.trim();
+        if (!token) {
+          setStatus(publishStatus, "请先在上方连接 GitHub。", "error");
+          return;
+        }
+        if (!title) {
+          setStatus(publishStatus, "请填写公告标题。", "error");
+          titleInput.focus();
+          return;
+        }
+        if (!content) {
+          setStatus(publishStatus, "请填写公告内容。", "error");
+          contentInput.focus();
+          return;
+        }
+        publishButton.disabled = true;
+        setStatus(publishStatus, "正在发布…");
+        try {
+          var latest = await getFileWithToken(token);
+          var announcements = latest.announcements.slice();
+          announcements.push({
+            id: "announcement-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8),
+            title: title,
+            content: content,
+            createdAt: new Date().toISOString()
+          });
+          var result = await putFile(token, announcements, latest.sha, "发布公告：" + title);
+          state.announcements = announcements.sort(function (left, right) {
+            return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
+          });
+          state.sha = result.content && result.content.sha ? result.content.sha : null;
+          renderHistory();
+          titleInput.value = "";
+          contentInput.value = "";
+          setStatus(publishStatus, "已发布。GitHub Pages 更新后，玩家刷新公告页即可看到。", "ok");
+        } catch (error) {
+          setStatus(publishStatus, error.message, "error");
+        } finally {
+          publishButton.disabled = false;
+        }
+      });
+
+      historyList.addEventListener("click", async function (event) {
+        var button = event.target.closest("[data-delete-id]");
+        if (!button) return;
+        var token = getToken();
+        if (!token) {
+          setStatus(publishStatus, "请先连接 GitHub 再删除公告。", "error");
+          return;
+        }
+        var itemId = button.getAttribute("data-delete-id");
+        if (!window.confirm("确定删除这条公告吗？删除后玩家将看不到。")) return;
+        button.disabled = true;
+        try {
+          var latest = await getFileWithToken(token);
+          var remaining = latest.announcements.filter(function (item) {
+            return item.id !== itemId;
+          });
+          await putFile(token, remaining, latest.sha, "删除公告");
+          await reloadAfterWrite(token);
+          setStatus(publishStatus, "公告已删除。", "ok");
+        } catch (error) {
+          setStatus(publishStatus, error.message, "error");
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      var savedToken = readSavedToken();
+      if (savedToken) {
+        tokenInput.value = savedToken;
+        rememberToken.checked = true;
+        loadWithToken(savedToken).catch(function (error) {
+          setStatus(tokenStatus, error.message, "error");
+          loadPublic();
+        });
+      } else {
+        loadPublic();
+      }
+    })();
+  </script>
+</body>
+</html>
