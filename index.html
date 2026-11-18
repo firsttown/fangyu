@@ -4035,6 +4035,136 @@ button.brand {
   color: var(--muted);
 }
 
+
+.social-guide {
+  padding: clamp(20px, 3.4vw, 32px);
+  margin-bottom: 15px;
+  background: var(--paper-2);
+  border: 1px solid rgba(180, 67, 39, 0.24);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  box-shadow: 0 15px 40px rgba(41, 48, 39, 0.045);
+}
+
+.social-guide h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  line-height: 1.35;
+}
+
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0;
+  margin: 15px 0 0;
+  list-style: none;
+  gap: 12px;
+}
+
+.guide-steps li {
+  padding: 12px 12px 13px;
+  background: var(--paper-3);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+.guide-steps .guide-num {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent);
+  font: 700 0.65rem var(--font-mono, monospace);
+  letter-spacing: 0.1em;
+}
+
+.guide-steps strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+}
+
+.guide-steps small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.64rem;
+  line-height: 1.7;
+}
+
+.social-guide details {
+  padding-top: 14px;
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: 0.7rem;
+  line-height: 1.85;
+}
+
+.social-guide summary {
+  color: var(--accent-dark);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.social-guide details p {
+  margin: 9px 0 0;
+}
+
+.social-tip {
+  padding: 11px 13px;
+  margin: 13px 0 0;
+  color: var(--ink-2);
+  background: rgba(180, 67, 39, 0.06);
+  border-left: 2px solid var(--accent);
+  font-size: 0.7rem;
+  line-height: 1.8;
+}
+
+.social-tip strong {
+  color: var(--accent-dark);
+}
+
+.share-warning {
+  padding: 13px 15px;
+  margin: 0 0 12px;
+  color: var(--accent-dark);
+  background: rgba(180, 67, 39, 0.08);
+  border: 1px solid rgba(180, 67, 39, 0.22);
+  border-radius: 3px;
+  font-size: 0.72rem;
+  line-height: 1.85;
+}
+
+.share-warning strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent-dark);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+}
+
+.challenge-tie-hint {
+  padding-top: 10px;
+  margin: 7px 0 0;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  font-size: 0.62rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .guide-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .guide-steps {
+    grid-template-columns: 1fr;
+  }
+}
 .account-social-panel .btn {
   margin-top: 2px;
 }
@@ -9406,7 +9536,7 @@ window.QUIZ_DATA = {
     throw new Error("好友码生成失败，请重试");
   }
 
-  async function copyText(text) {
+  async function copyText(text, successMessage) {
     const value = String(text || "");
     if (!value) return;
     try {
@@ -9422,7 +9552,7 @@ window.QUIZ_DATA = {
         document.execCommand("copy");
         area.remove();
       }
-      showToast("已复制");
+      showToast(successMessage || "已复制");
     } catch (error) {
       showToast("复制失败，请手动选择文本");
     }
@@ -9540,6 +9670,28 @@ window.QUIZ_DATA = {
   }
 
 
+  function friendsGuideHTML() {
+    return (
+      '<section class="social-guide" aria-labelledby="guideTitle">' +
+      '<p class="panel-kicker">第一次使用？先看这里</p>' +
+      '<h2 id="guideTitle">好友挑战，四步完成</h2>' +
+      '<ol class="guide-steps">' +
+      '<li><span class="guide-num">01</span><strong>建自己的档案</strong><small>填写你自己的昵称，拿到好友码。好友看到的是你填的名字。</small></li>' +
+      '<li><span class="guide-num">02</span><strong>加好友</strong><small>把你的好友码发给朋友，或输入对方的好友码，等对方接受。</small></li>' +
+      '<li><span class="guide-num">03</span><strong>用当前设置出题</strong><small>先在首页设置范围、题型、题数和时限，再回这里创建挑战。</small></li>' +
+      '<li><span class="guide-num">04</span><strong>发链接，提醒用浏览器打开</strong><small>复制挑战链接发给好友；QQ/微信里直接点可能打不开，请在 Chrome、Edge 或 Safari 中打开。</small></li>' +
+      '</ol>' +
+      '<details><summary>详细说明和常见问题</summary>' +
+      '<p><strong>昵称是谁的？</strong>「好友昵称」填的是你自己的名字，好友加你后看到的就是它。好友的名字由好友自己填写，你不需要替对方填。</p>' +
+      '<p><strong>为什么要用浏览器打开？</strong>QQ、微信等应用内置的浏览器可能拦截或无法保持登录状态。复制链接后，粘贴到 Chrome、Edge 或 Safari；如果已经在 QQ/微信里打开，点右上角「···」→「在浏览器打开」。</p>' +
+      '<p><strong>需要两个人同时在线吗？</strong>不需要。你创建一套冻结的题，好友之后打开链接作答，成绩提交后双方都能看到比分。</p>' +
+      '<p><strong>好友第一次打开链接要做什么？</strong>先注册/登录本地账号，再填一次他自己的好友昵称，然后点「接受挑战」。本地答题成绩和云端好友数据是两套数据。</p>' +
+      '<p><strong>同分怎么排名？</strong>分数相同时，用时更短的人排在前面。</p>' +
+      '</details>' +
+      '</section>'
+    );
+  }
+
   function friendsTemplate() {
     const profile = state.cloudProfile;
     let body = "";
@@ -9563,8 +9715,9 @@ window.QUIZ_DATA = {
         '<p class="panel-kicker">云端好友</p>' +
         "<h2>先给好友档案起个名字</h2>" +
         '<p class="social-lead">不用邮箱和手机号。名字和好友码会保存在云端，换设备后好友还能找到你。</p>' +
+        '<p class="social-tip"><strong>这个昵称是你自己的。</strong>好友加你后看到的是这个名字，不是好友的名字；好友的名字由对方自己填写。</p>' +
         '<form class="friend-profile-form" data-cloud-profile-form>' +
-        '<label class="form-field" for="cloudNickname"><span>好友昵称</span>' +
+        '<label class="form-field" for="cloudNickname"><span>你自己的昵称（好友看到的名字）</span>' +
         '<input id="cloudNickname" type="text" maxlength="20" required placeholder="2–20 个字符" value="' +
         escapeHTML(state.auth.user ? state.auth.user.nickname : "") + '"></label>' +
         '<button type="submit" class="btn btn-primary">创建好友档案</button>' +
@@ -9602,6 +9755,8 @@ window.QUIZ_DATA = {
         ? '<div class="challenge-share">' +
           '<p class="panel-kicker">挑战链接</p>' +
           "<h3>把这条链接发给好友</h3>" +
+          '<div class="share-warning"><strong>请让好友在浏览器中打开</strong>' +
+          'QQ、微信里直接点可能打不开挑战页</div>' +
           '<div class="share-row"><input id="challengeShareInput" type="text" readonly value="' + escapeHTML(state.friendShare.url) + '">' +
           '<button type="button" class="btn btn-primary btn-small" data-copy-challenge-share>复制</button></div>' +
           '<div class="share-actions"><button type="button" class="btn btn-quiet btn-small" data-open-challenge-share>打开挑战</button>' +
@@ -9629,7 +9784,7 @@ window.QUIZ_DATA = {
         '<section class="social-panel social-profile-panel">' +
         '<p class="panel-kicker">我的好友档案</p>' +
         "<h2>" + escapeHTML(cloudDisplayName(profile)) + "</h2>" +
-        '<p class="social-lead">把这串好友码发给朋友，对方就能加你。</p>' +
+        '<p class="social-lead">这是好友加你后看到的名字。把这串好友码发给朋友，对方就能加你。</p>' +
         '<div class="friend-code-box"><span id="friendCodeText">' + escapeHTML(profile.friend_code) + "</span>" +
         '<button type="button" class="inline-link" data-copy-friend-code>复制</button></div>' +
         '<p class="social-footnote">好友与挑战成绩保存在云端；本地答题记录仍只在本机。</p>' +
@@ -9661,7 +9816,7 @@ window.QUIZ_DATA = {
       '<p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span>好友与挑战</p>' +
       '<h1 id="friendsTitle" tabindex="-1">把一局地名，<br>变成两个人的较量。</h1>' +
       '<p class="page-lead">加好友、出一套题、把链接发过去。好友不同时在线，也能异步比一局。</p>' +
-      "</section>" + body
+      "</section>" + friendsGuideHTML() + body
     );
   }
 
@@ -9729,8 +9884,11 @@ window.QUIZ_DATA = {
         state.friendShare = { code: code, url: buildChallengeUrl(code) };
         await loadFriendsData();
         if (state.screen === "friends") app.innerHTML = friendsTemplate();
-        await copyText(state.friendShare.url);
-        showToast("挑战已创建，链接已复制");
+        await copyText(state.friendShare.url, "挑战已创建，链接已复制；请提醒好友在浏览器中打开");
+        window.requestAnimationFrame(function () {
+          const sharePanel = document.querySelector(".challenge-share");
+          if (sharePanel) sharePanel.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
         return result.data;
       }
       lastError = result.error;
@@ -9769,6 +9927,7 @@ window.QUIZ_DATA = {
       .select("*")
       .eq("challenge_id", challenge.id)
       .order("score", { ascending: false })
+      .order("duration_seconds", { ascending: true })
       .order("completed_at", { ascending: true });
     if (attemptsResult.error) throw new Error(cloudErrorMessage(attemptsResult.error));
     const attempts = attemptsResult.data || [];
@@ -9811,8 +9970,9 @@ window.QUIZ_DATA = {
     } else if (!state.cloudProfile) {
       body = '<section class="social-panel">' +
         '<p class="panel-kicker">先建立好友档案</p><h2>起个名字，再接受挑战</h2>' +
+        '<p class="social-tip"><strong>填的是你自己的名字。</strong>好友看到的是这个名字，不是好友的名字。</p>' +
         '<form class="friend-profile-form" data-cloud-profile-form>' +
-        '<label class="form-field" for="cloudNickname"><span>好友昵称</span>' +
+        '<label class="form-field" for="cloudNickname"><span>你自己的昵称（好友看到的名字）</span>' +
         '<input id="cloudNickname" type="text" maxlength="20" required placeholder="2–20 个字符" value="' +
         escapeHTML(state.auth.user ? state.auth.user.nickname : "") + '"></label>' +
         '<button type="submit" class="btn btn-primary">创建并继续</button></form></section>';
@@ -9841,6 +10001,9 @@ window.QUIZ_DATA = {
         (challenge.mode === "blank" ? "填空题" : "选择题") + " · " + (Array.isArray(challenge.questions) ? challenge.questions.length : 0) + " 题 · " +
         formatClock(challenge.seconds) + "</p>" +
         (expired ? '<p class="challenge-expired">这个挑战已经过期，只能查看历史成绩。</p>' : "") +
+        (state.cloudUser.id === challenge.owner_id
+          ? '<div class="share-warning"><strong>发给好友时请提醒：用浏览器打开</strong>QQ/微信内置浏览器可能无法进入挑战页；请好友复制链接到 Chrome、Edge 或 Safari。</div>'
+          : "") +
         '<div class="challenge-summary-actions">' +
         (!expired ? '<button type="button" class="btn btn-primary" data-start-challenge>' + playLabel + "</button>" : "") +
         (state.cloudUser.id === challenge.owner_id ? '<button type="button" class="btn btn-quiet" data-copy-challenge-current>复制挑战链接</button>' : "") +
@@ -9848,7 +10011,8 @@ window.QUIZ_DATA = {
         "</div>" +
         (mine ? '<p class="challenge-mine">你的成绩：<strong>' + mine.attempt.score + "</strong> 分 · " + formatClock(mine.attempt.duration_seconds) + "</p>" : "") +
         "</section>" +
-        '<section class="social-panel"><p class="panel-kicker">挑战成绩</p><h2>好友比分</h2>' + attemptsHTML + "</section>";
+        '<section class="social-panel"><p class="panel-kicker">挑战成绩</p><h2>好友比分</h2>' + attemptsHTML +
+        '<p class="challenge-tie-hint">同分时，用时更短的人排名靠前。</p></section>';
     }
     return pageShell(
       "account",
@@ -10635,14 +10799,14 @@ window.QUIZ_DATA = {
       const copyChallengeCode = event.target.closest("[data-copy-challenge-code]");
       if (copyChallengeCode) {
         event.preventDefault();
-        copyText(buildChallengeUrl(copyChallengeCode.getAttribute("data-copy-challenge-code")));
+        copyText(buildChallengeUrl(copyChallengeCode.getAttribute("data-copy-challenge-code")), "链接已复制，请提醒好友在浏览器中打开");
         return;
       }
 
       const copyChallengeShare = event.target.closest("[data-copy-challenge-share]");
       if (copyChallengeShare) {
         event.preventDefault();
-        if (state.friendShare) copyText(state.friendShare.url);
+        if (state.friendShare) copyText(state.friendShare.url, "链接已复制，请提醒好友在浏览器中打开");
         return;
       }
 
@@ -10664,7 +10828,7 @@ window.QUIZ_DATA = {
       const copyChallengeCurrent = event.target.closest("[data-copy-challenge-current]");
       if (copyChallengeCurrent) {
         event.preventDefault();
-        if (state.challenge) copyText(buildChallengeUrl(state.challenge.code));
+        if (state.challenge) copyText(buildChallengeUrl(state.challenge.code), "链接已复制，请提醒好友在浏览器中打开");
         return;
       }
 
